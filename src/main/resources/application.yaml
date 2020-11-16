@@ -2,3 +2,7 @@ initbean:
   paths: [/Users/i306454/gitStore/TraceSonarOL/src/main/resources/lib/tracesonar-0.1-SNAPSHOT.jar]
 
 debug: true
+
+spring:
+  thymeleaf:
+    cache: false

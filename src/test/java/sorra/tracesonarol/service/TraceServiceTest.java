@@ -13,6 +13,12 @@ class TraceServiceTest {
 
     @Test
     public void test_query() {
+        System.out.println(service.query());
         assertNotNull(service.query());
+    }
+
+    @Test
+    public void test_query02() {
+        System.out.println(service.query02());
     }
 }
