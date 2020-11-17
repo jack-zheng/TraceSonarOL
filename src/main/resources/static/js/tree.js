@@ -53,30 +53,31 @@ $.fn.extend({
     }
 });
 
-//Initialization of treeviews
-
-$('#tree1').treed();
-$('#tree2').treed({openedClass: 'glyphicon-folder-open', closedClass: 'glyphicon-folder-close'});
 
 
-function loopNode(nodeList) {
-    for (let i = 0; i < nodeList.length; i++) {
-        let nodeHtml = printMethodTree(nodeList[i], "");
-        console.log("ret: " + nodeHtml)
-    }
+function formatMethodDesc(desc) {
+    // split desc, to return type string + method params
+    let index = desc.indexOf(")");
+    return [desc.substr(index+1), desc.substr(0, index+1)];
 }
 
-function printMethodTree(nodeTree, methodHtml) {
-    methodHtml += "<li>";
+function formatMethodName(name) {
+    // if name contains characters like '<' or '>', we need to skip it or html will display incorrect.
+    return name.replace('<', '').replace('>', '');
+}
+
+function printMethodTree(nodeTree) {
+    let methodHtml = "<li>";
     let method = nodeTree['method'];
-    let methodStr = method['owner'] + "#" + method['methodName'] + " " + method['desc']
+    let descArr = formatMethodDesc(method['desc']);
+    let methodStr = descArr[0] + "::" + method['owner'] + "::" + formatMethodName(method['methodName']) + descArr[1];
     methodHtml += methodStr;
 
     let callers = nodeTree['callers'];
     if (callers.length !== 0) {
         methodHtml += "<ul>";
         for (let i = 0; i < callers.length; i++) {
-            methodHtml += printMethodTree(callers[i], methodHtml);
+            methodHtml += printMethodTree(callers[i]);
         }
         methodHtml += "</ul>";
     }
@@ -87,15 +88,18 @@ function printMethodTree(nodeTree, methodHtml) {
 // Get query data
 var jsonData;
 $.getJSON("/objtojson", function (data) {
-    var items = [];
-    // $.each( data, function( key, val ) {
-    //     items.push( "<li id='" + key + "'>" + val + "</li>" );
-    // });
-    //
-    // $( "<ul/>", {
-    //     "class": "my-new-list",
-    //     html: items.join( "" )
-    // }).appendTo( "body" );
-    jsonData = data;
-    loopNode(data);
+    // populate search condition to result
+    // "method":{"desc":"([Ljava/lang/String;)V","methodName":"main","owner":"sorra/tracesonar/sample/modifier/Entrypoint"}
+    let fakeRoot = {}
+    let fakeMethod = {}
+    fakeMethod['desc'] = '([Ljava/lang/String;)V';
+    fakeMethod['methodName'] = 'fakeRootMethod';
+    fakeMethod['owner'] = 'fakeOwnerClass';
+    fakeRoot['method'] = fakeMethod;
+    fakeRoot['callers'] = data;
+    let htmlStr = printMethodTree(fakeRoot);
+    $('#tree1').append(htmlStr)
+
+    //Initialization of treeviews
+    $('#tree1').treed();
 });
