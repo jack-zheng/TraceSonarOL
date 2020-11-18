@@ -104,8 +104,10 @@ function searchQuery(queryStr) {
         fakeRoot['method'] = fakeMethod;
         fakeRoot['callers'] = data;
         let htmlStr = printMethodTree(fakeRoot);
-        $('#tree1').append(htmlStr)
 
+        // delete child node first
+        $('#tree1').empty();
+        $('#tree1').append(htmlStr)
         //Initialization of treeviews
         $('#tree1').treed();
     });
