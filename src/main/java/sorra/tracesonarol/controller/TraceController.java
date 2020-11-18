@@ -19,12 +19,12 @@ public class TraceController {
 
     @GetMapping("/query/{queryStr}")
     @ResponseBody
-    public String objToJson(@PathVariable("queryStr") String query) {
+    public String query(@PathVariable("queryStr") String query) {
         System.out.println(query);
         String[] ret = query.split("#");
         String owner = ret[0].replace(".", "/");
         String method = ret[1];
-        Stream<TreeNode> nodeStream = (new Searcher(true, true, Collections.emptyList())).search(new Query(owner, method, "*"));
+        Stream<TreeNode> nodeStream = (new Searcher(false, false, Collections.emptyList())).search(new Query(owner, method, "*"));
         List<TreeNode> nodeList = nodeStream.collect(Collectors.toList());
         String jsonStr = JSON.toJSONString(nodeList);
         System.out.println(jsonStr);
@@ -32,7 +32,7 @@ public class TraceController {
     }
 
     @GetMapping("/tree")
-    public String getTestPage() {
+    public String index() {
         return "tree";
     }
 }
