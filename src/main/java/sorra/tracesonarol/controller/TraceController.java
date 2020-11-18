@@ -1,6 +1,7 @@
 package sorra.tracesonarol.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +27,7 @@ public class TraceController {
         String method = ret[1];
         Stream<TreeNode> nodeStream = (new Searcher(false, false, Collections.emptyList())).search(new Query(owner, method, "*"));
         List<TreeNode> nodeList = nodeStream.collect(Collectors.toList());
-        String jsonStr = JSON.toJSONString(nodeList);
+        String jsonStr = JSON.toJSONString(nodeList, SerializerFeature.DisableCircularReferenceDetect);
         System.out.println(jsonStr);
         return jsonStr;
     }
