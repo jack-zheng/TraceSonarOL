@@ -69,8 +69,13 @@ function formatMethodName(name) {
 function printMethodTree(nodeTree) {
     let methodHtml = "<li>";
     let method = nodeTree['method'];
-    let descArr = formatMethodDesc(method['desc']);
-    let methodStr = descArr[0] + "::" + method['owner'] + "::" + formatMethodName(method['methodName']) + descArr[1];
+    let methodStr = "";
+    if (method['methodName'] == null) {
+        methodStr = JSON.stringify(method);
+    } else {
+        let descArr = formatMethodDesc(method['desc']);
+        methodStr = descArr[0] + "::" + method['owner'] + "::" + formatMethodName(method['methodName']) + descArr[1];
+    }
     methodHtml += methodStr;
 
     let callers = nodeTree['callers'];
@@ -85,21 +90,37 @@ function printMethodTree(nodeTree) {
     return methodHtml;
 }
 
-// Get query data
-var jsonData;
-$.getJSON("/objtojson", function (data) {
-    // populate search condition to result
-    // "method":{"desc":"([Ljava/lang/String;)V","methodName":"main","owner":"sorra/tracesonar/sample/modifier/Entrypoint"}
-    let fakeRoot = {}
-    let fakeMethod = {}
-    fakeMethod['desc'] = '([Ljava/lang/String;)V';
-    fakeMethod['methodName'] = 'fakeRootMethod';
-    fakeMethod['owner'] = 'fakeOwnerClass';
-    fakeRoot['method'] = fakeMethod;
-    fakeRoot['callers'] = data;
-    let htmlStr = printMethodTree(fakeRoot);
-    $('#tree1').append(htmlStr)
+function searchQuery(queryStr) {
+    // Get query data
+    let queryUrl = "/query/" + escape(queryStr);
+    console.log("Query str: " + queryStr)
+    $.getJSON(queryUrl, function (data) {
+        // populate search condition to result
+        let fakeRoot = {}
+        let fakeMethod = {}
+        fakeMethod['desc'] = '([Ljava/lang/String;)V';
+        fakeMethod['methodName'] = 'fakeRootMethod';
+        fakeMethod['owner'] = 'fakeOwnerClass';
+        fakeRoot['method'] = fakeMethod;
+        fakeRoot['callers'] = data;
+        let htmlStr = printMethodTree(fakeRoot);
+        $('#tree1').append(htmlStr)
 
-    //Initialization of treeviews
-    $('#tree1').treed();
+        //Initialization of treeviews
+        $('#tree1').treed();
+    });
+}
+
+$( "#search" ).click(function() {
+    searchQuery($("#searchCondition").val());
+});
+
+// search box enter key down event
+$('#searchCondition').keypress(function (e) {
+    let key = e.which;
+    if(key === 13)  // the enter key code
+    {
+        searchQuery($("#searchCondition").val());
+        return false;
+    }
 });

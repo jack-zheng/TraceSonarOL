@@ -15,4 +15,6 @@ import java.util.List;
 @ConfigurationProperties(prefix = "initbean")
 public class InitBean {
     private List<String> paths;
+    private List<String> includedQualifiers;
+    private List<String> excludedQualifiers;
 }

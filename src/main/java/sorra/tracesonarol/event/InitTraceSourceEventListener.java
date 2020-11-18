@@ -10,8 +10,6 @@ import sorra.tracesonar.core.FileWalker;
 import sorra.tracesonar.core.QualifierFilter;
 import sorra.tracesonarol.pojo.InitBean;
 
-import java.util.Collections;
-
 @Component
 public class InitTraceSourceEventListener implements ApplicationListener<ApplicationReadyEvent> {
     private static final Logger logger = LoggerFactory.getLogger(InitTraceSourceEventListener.class);
@@ -22,7 +20,10 @@ public class InitTraceSourceEventListener implements ApplicationListener<Applica
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        FileWalker.walkAll(bean.getPaths(), new QualifierFilter(Collections.emptyList(), Collections.emptyList()));
-        logger.info("Finish fill ClassMap and GraphStore...");
+        long start = System.currentTimeMillis();
+        System.out.println();
+        FileWalker.walkAll(bean.getPaths(), new QualifierFilter(bean.getIncludedQualifiers(), bean.getExcludedQualifiers()));
+        long end = System.currentTimeMillis();
+        logger.info("Finish populate ClassMap and GraphStore, time cost: " + (end-start));
     }
 }
